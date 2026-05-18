@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-bug-lab/schemas/searcher-output.schema.json",
+  "title": "SearcherOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["task_id", "status", "bugs"],
+  "properties": {
+    "task_id": { "type": "string", "minLength": 1 },
+    "status":  { "type": "string", "enum": ["ok", "failed"] },
+    "bugs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": { "$ref": "bug.schema.json" }
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "harness_session_id": { "type": "string" }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-bug-lab/schemas/searcher-input.schema.json",
+  "title": "SearcherInput",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "role", "project", "objective", "constraints", "required_bug_fields"],
+  "properties": {
+    "task_id": { "type": "string", "minLength": 1 },
+    "role":    { "const": "searcher_agent" },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "bug_bounty_url", "repo_path", "scopes"],
+      "properties": {
+        "id":             { "type": "string" },
+        "name":           { "type": "string" },
+        "bug_bounty_url": { "type": "string" },
+        "repo_path":      { "type": "string" },
+        "scopes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "name"],
+            "properties": {
+              "id":          { "type": "string" },
+              "name":        { "type": "string" },
+              "description": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    },
+    "objective": { "type": "string" },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_only", "min_findings", "max_findings", "output_format", "do_not_modify_repo"],
+      "properties": {
+        "read_only":          { "const": true },
+        "min_findings":       { "type": "integer", "minimum": 1 },
+        "max_findings":       { "type": "integer", "minimum": 1, "maximum": 5 },
+        "output_format":      { "const": "json" },
+        "do_not_modify_repo": { "const": true }
+      }
+    },
+    "required_bug_fields": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

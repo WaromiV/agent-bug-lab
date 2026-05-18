@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-bug-lab/schemas/cleaner-output.schema.json",
+  "title": "CleanerOutput",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["task_id", "status", "remove_bug_ids", "keep_bug_ids", "decisions"],
+  "properties": {
+    "task_id":        { "type": "string", "minLength": 1 },
+    "status":         { "type": "string", "enum": ["ok", "failed"] },
+    "remove_bug_ids": { "type": "array", "items": { "type": "string" } },
+    "keep_bug_ids":   { "type": "array", "items": { "type": "string" } },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["bug_id", "decision", "reason"],
+        "properties": {
+          "bug_id":   { "type": "string" },
+          "decision": { "type": "string", "enum": ["kept", "removed", "refined", "needs_more_work"] },
+          "reason":   { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

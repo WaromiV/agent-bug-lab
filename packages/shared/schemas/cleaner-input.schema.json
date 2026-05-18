@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-bug-lab/schemas/cleaner-input.schema.json",
+  "title": "CleanerInput",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "role", "project", "selected_bugs", "objective", "constraints"],
+  "properties": {
+    "task_id": { "type": "string", "minLength": 1 },
+    "role":    { "const": "cleaner_agent" },
+    "project": {
+      "type": "object",
+      "required": ["id", "name", "bug_bounty_url", "repo_path", "scopes"],
+      "properties": {
+        "id":             { "type": "string" },
+        "name":           { "type": "string" },
+        "bug_bounty_url": { "type": "string" },
+        "repo_path":      { "type": "string" },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name"],
+            "properties": {
+              "id":          { "type": "string" },
+              "name":        { "type": "string" },
+              "description": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    },
+    "selected_bugs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "bug.schema.json" }
+    },
+    "objective": { "type": "string" },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_only", "output_format", "do_not_modify_repo"],
+      "properties": {
+        "read_only":          { "const": true },
+        "output_format":      { "const": "json" },
+        "do_not_modify_repo": { "const": true }
+      }
+    }
+  }
+}

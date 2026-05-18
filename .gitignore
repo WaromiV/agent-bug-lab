@@ -1,0 +1,58 @@
+# ── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.python-version
+
+# Test / coverage / linter caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+
+# ── Node / TypeScript / Vite ────────────────────────────────────────────────
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# ── Env / secrets ───────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── OS / editors ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Runtime artifacts (forensic, generated per run, never committed) ────────
+/data/*
+!/data/.gitkeep
+
+# ── Browser / e2e screenshots and recordings ────────────────────────────────
+.playwright-mcp/
+playwright-report/
+test-results/
+e2e-*.png
+e2e-*.jpg
+*.har
+
+# ── Misc ───────────────────────────────────────────────────────────────────
+*.log
+*.pid
+*.tmp

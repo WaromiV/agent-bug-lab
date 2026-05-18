@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-bug-lab/schemas/bug.schema.json",
+  "title": "Bug",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "severity",
+    "scope_id",
+    "description",
+    "repro_path",
+    "repro_usage",
+    "missing_for_full_chain"
+  ],
+  "properties": {
+    "id":                     { "type": "string", "minLength": 1 },
+    "severity":               { "type": "string", "enum": ["critical", "high", "medium", "low", "info", "unknown"] },
+    "scope_id":               { "type": "string", "minLength": 1 },
+    "description":            { "type": "string", "minLength": 1 },
+    "repro_path":             { "type": "string", "minLength": 1 },
+    "repro_usage":            { "type": "string", "minLength": 1 },
+    "missing_for_full_chain": { "type": "string", "minLength": 1 }
+  }
+}

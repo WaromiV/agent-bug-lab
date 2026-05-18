@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: agent_bug_lab
+      POSTGRES_PASSWORD: agent_bug_lab
+      POSTGRES_DB: agent_bug_lab
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent_bug_lab"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ./apps/api
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://agent_bug_lab:agent_bug_lab@postgres:5432/agent_bug_lab
+      REDIS_URL: redis://redis:6379/0
+      DATA_DIR: /app/data
+      FIXED_REPO_ROOT: /workspace/target
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ${FIXED_REPO_ROOT_HOST:-./target}:/workspace/target:ro
+
+  worker:
+    build:
+      context: ./apps/api
+    command: ["arq", "app.workers.arq_settings.WorkerSettings"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://agent_bug_lab:agent_bug_lab@postgres:5432/agent_bug_lab
+      REDIS_URL: redis://redis:6379/0
+      DATA_DIR: /app/data
+      FIXED_REPO_ROOT: /workspace/target
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ${FIXED_REPO_ROOT_HOST:-./target}:/workspace/target:ro
+
+volumes:
+  postgres_data:

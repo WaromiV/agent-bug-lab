@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 360" role="img" aria-label="agent-bug-lab — modern mega-fast harness AI security research workbench">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a0a"/>
+      <stop offset="55%" stop-color="#111111"/>
+      <stop offset="100%" stop-color="#1a0a26"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="dim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a1a1aa"/>
+      <stop offset="100%" stop-color="#71717a"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0L0 0 0 32" fill="none" stroke="#262626" stroke-width="0.5"/>
+    </pattern>
+    <filter id="soft" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="14"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="360" fill="url(#bg)"/>
+  <rect width="1280" height="360" fill="url(#grid)" opacity="0.45"/>
+
+  <!-- Glow blob -->
+  <circle cx="1020" cy="170" r="180" fill="#7c3aed" opacity="0.22" filter="url(#soft)"/>
+  <circle cx="220" cy="230" r="140" fill="#ec4899" opacity="0.16" filter="url(#soft)"/>
+
+  <!-- Side bracket -->
+  <g stroke="url(#accent)" stroke-width="2" fill="none" opacity="0.85">
+    <path d="M70 110 L60 110 L60 250 L70 250"/>
+    <path d="M1210 110 L1220 110 L1220 250 L1210 250"/>
+  </g>
+
+  <!-- Eyebrow -->
+  <text x="80" y="100" font-family="ui-monospace, JetBrains Mono, Menlo, monospace" font-size="14" letter-spacing="4" fill="url(#accent)">// AGENTIC SECURITY RESEARCH</text>
+
+  <!-- Title -->
+  <text x="80" y="180" font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" font-weight="800" font-size="78" fill="#f4f4f5">
+    agent-bug-lab
+  </text>
+
+  <!-- Tag -->
+  <text x="80" y="218" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-weight="500" font-size="22" fill="url(#accent)">
+    very modern mega-fast harness AI security research bug bounty solver 3000
+  </text>
+
+  <!-- Bullet stack -->
+  <g font-family="ui-monospace, JetBrains Mono, Menlo, monospace" font-size="15" fill="url(#dim)">
+    <text x="80" y="266">✦ searcher · cleaner · critical-thinking agents</text>
+    <text x="80" y="288">✦ Codex CLI + Claude Code CLI harnesses · live WebSocket runs</text>
+    <text x="80" y="310">✦ FastAPI + React + PostgreSQL + Redis + Arq · every command inspectable</text>
+  </g>
+
+  <!-- Wordmark dots -->
+  <g fill="url(#accent)">
+    <circle cx="1130" cy="290" r="3"/>
+    <circle cx="1148" cy="290" r="3"/>
+    <circle cx="1166" cy="290" r="3"/>
+  </g>
+</svg>
