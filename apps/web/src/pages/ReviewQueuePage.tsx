@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { Brain, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { api } from "@/lib/api";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -35,15 +35,6 @@ export function ReviewQueuePage() {
     onSuccess: (run) => navigate(`/runs/${run.id}`),
   });
 
-  const critical = useMutation({
-    mutationFn: () => {
-      if (selected.size !== 1) throw new Error("select exactly one bug");
-      const id = Array.from(selected)[0];
-      return api.runCritical({ bug_id: id });
-    },
-    onSuccess: (run) => navigate(`/runs/${run.id}`),
-  });
-
   return (
     <div className="space-y-6">
       <div>
@@ -69,13 +60,6 @@ export function ReviewQueuePage() {
             >
               <Sparkles className="h-4 w-4" /> Run cleaner
               {selected.size > 0 ? ` (${selected.size})` : ""}
-            </Button>
-            <Button
-              onClick={() => critical.mutate()}
-              disabled={selected.size !== 1 || critical.isPending}
-              data-testid="run-critical-from-queue"
-            >
-              <Brain className="h-4 w-4" /> Critical-thinking
             </Button>
           </div>
         </CardHeader>

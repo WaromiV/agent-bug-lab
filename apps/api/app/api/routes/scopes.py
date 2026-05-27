@@ -7,21 +7,9 @@ from app.db.models import Project, Scope
 from app.schemas.scope import ScopeCreate, ScopePatch, ScopeRead
 from app.services import scope_service
 
-_PRELIMINARY_IDS = frozenset(p.seed_id for p in scope_service.PRELIMINARY_SCOPES)
-
 
 def _serialize(scope: Scope) -> ScopeRead:
-    semantic_prefix = scope.id.split("__", 1)[0] if "__" in scope.id else scope.id
-    return ScopeRead.model_validate(
-        {
-            "id": scope.id,
-            "project_id": scope.project_id,
-            "name": scope.name,
-            "description": scope.description,
-            "created_at": scope.created_at,
-            "is_preliminary": semantic_prefix in _PRELIMINARY_IDS,
-        }
-    )
+    return ScopeRead.model_validate(scope)
 
 router = APIRouter(tags=["scopes"])
 

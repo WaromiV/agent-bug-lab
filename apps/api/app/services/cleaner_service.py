@@ -60,6 +60,7 @@ def queue_cleaner_run(
     bugs: list[Bug],
     harness: str,
     model: str,
+    effort: str | None,
 ) -> AgentRun:
     """Create a cleaner_agent run and snapshot the selected bugs."""
     if not bugs:
@@ -72,6 +73,7 @@ def queue_cleaner_run(
         role="cleaner_agent",
         harness=harness,
         model=model,
+        effort=effort,
         objective=raw_input["objective"],
         raw_input=raw_input,
     )

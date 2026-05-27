@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { ProjectsPage } from "@/pages/ProjectsPage";
 import { ProjectDetailPage } from "@/pages/ProjectDetailPage";
+import { ProjectPreparePage } from "@/pages/ProjectPreparePage";
 import { RunsPage } from "@/pages/RunsPage";
 import { RunDetailPage } from "@/pages/RunDetailPage";
 import { BugsPage } from "@/pages/BugsPage";
@@ -23,6 +24,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<Navigate to="/projects" replace />} />
           <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/:id/prepare" element={<ProjectPreparePage />} />
           <Route path="/projects/:id" element={<ProjectDetailPage />} />
           <Route path="/runs" element={<RunsPage />} />
           <Route path="/runs/:id" element={<RunDetailPage />} />

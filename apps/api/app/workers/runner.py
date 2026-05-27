@@ -44,9 +44,19 @@ async def drive_run(run_id: str, apply_output: ApplyOutput) -> None:
         run_manager.mark_running(s, run)
         spec_name = run.harness
         model = run.model
+        effort = run.effort
         raw_input = dict(run.raw_input)
         data_dir = Path(run.data_dir)
-        resume_session = run.harness_session_id if run.resume_from_run_id else None
+        # Only resume if (a) the run was explicitly created as a resume AND
+        # (b) the global setting allows it. This prevents stale context from
+        # prior conversations contaminating fresh searcher runs.
+        from app.services import settings_service
+        cfg = settings_service.get_or_init(s)
+        resume_session = (
+            run.harness_session_id
+            if run.resume_from_run_id and cfg.use_resume_when_available
+            else None
+        )
         run_manager.append_log(s, run.id, "info", "harness.input.created", {"data_dir": str(data_dir)})
         s.commit()
 
@@ -73,6 +83,7 @@ async def drive_run(run_id: str, apply_output: ApplyOutput) -> None:
         resume_session=resume_session,
         timeout_seconds=timeout,
         on_line=on_line,
+        effort=effort,
     )
     log.info(
         "harness.output.received",

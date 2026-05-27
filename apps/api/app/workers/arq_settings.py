@@ -5,7 +5,8 @@ from arq.connections import RedisSettings
 from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.workers.cleaner_worker import run_cleaner
-from app.workers.critical_worker import run_critical
+from app.workers.debate_worker import run_debate
+from app.workers.prepare_worker import run_prepare
 from app.workers.searcher_worker import run_searcher
 
 
@@ -14,7 +15,7 @@ async def startup(ctx: dict) -> None:
 
 
 class WorkerSettings:
-    functions = [run_searcher, run_cleaner, run_critical]
+    functions = [run_searcher, run_cleaner, run_prepare, run_debate]
     on_startup = startup
     redis_settings = RedisSettings.from_dsn(get_settings().redis_url)
     max_jobs = 4

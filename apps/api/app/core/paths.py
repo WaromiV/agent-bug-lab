@@ -19,17 +19,29 @@ def project_dir(project_id: str) -> Path:
     return p
 
 
+def static_facts_dir(project_id: str) -> Path:
+    """Per-project static-facts cache (scratch build + facts.json)."""
+    p = project_dir(project_id) / "static_facts"
+    p.mkdir(parents=True, exist_ok=True)
+    return p
+
+
 def run_dir(role: str, identifier: str) -> Path:
     """
     Run artifact directory.
 
-    role in {searcher_agent, cleaner_agent, critical_thinking_agent}.
+    role in {searcher_agent, cleaner_agent, prepare_agent, debater_pro,
+    debater_con, judge_per_round, judge_final}.
     identifier is the run id (or review id for cleaner runs).
     """
     prefix = {
         "searcher_agent": "searcher",
         "cleaner_agent": "cleaner",
-        "critical_thinking_agent": "critical",
+        "prepare_agent": "prepare",
+        "debater_pro": "debate_pro",
+        "debater_con": "debate_con",
+        "judge_per_round": "judge_note",
+        "judge_final": "judge_final",
     }[role]
     p = data_root() / f"{prefix}_{identifier}"
     p.mkdir(parents=True, exist_ok=True)

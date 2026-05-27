@@ -5,7 +5,15 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict
 
-Role = Literal["searcher_agent", "cleaner_agent", "critical_thinking_agent"]
+Role = Literal[
+    "searcher_agent",
+    "cleaner_agent",
+    "prepare_agent",
+    "debater_pro",
+    "debater_con",
+    "judge_per_round",
+    "judge_final",
+]
 Status = Literal["queued", "running", "succeeded", "failed", "cancelled"]
 
 
@@ -17,6 +25,7 @@ class RunRead(BaseModel):
     role: Role
     harness: str
     model: str
+    effort: str | None
     status: Status
     objective: str
     resume_from_run_id: str | None

@@ -140,6 +140,12 @@ class HarnessSpec(ABC):
         """Return (parsed_output, parse_error). Exactly one is non-None on success/failure."""
         ...
 
+    def effort_args(self, effort: str | None) -> list[str]:
+        """Per-harness effort flag. Default: harness does not expose effort
+        as a CLI option (Codex configures it via ~/.codex/config.toml).
+        Subclasses override when the CLI accepts a flag."""
+        return []
+
 
 class CodexSpec(HarnessSpec):
     name = "codex"
@@ -214,6 +220,10 @@ class ClaudeCodeSpec(HarnessSpec):
         if resume_session:
             argv += ["--resume", resume_session]
         return argv
+
+    def effort_args(self, effort: str | None) -> list[str]:
+        # Claude Code: `--effort low|medium|high|xhigh|max`.
+        return ["--effort", effort] if effort else []
 
     def extract_output(self, *, stdout, stderr, exit_code, data_dir):
         if not stdout.strip():
@@ -306,6 +316,7 @@ async def run_harness(
     resume_session: str | None = None,
     timeout_seconds: int | None = None,
     on_line: LineHandler | None = None,
+    effort: str | None = None,
 ) -> HarnessResult:
     """Run a harness CLI and return parsed model JSON.
 
@@ -319,6 +330,7 @@ async def run_harness(
     cmd = spec.build_argv(
         binary=binary, model=model, resume_session=resume_session, data_dir=data_dir
     )
+    cmd += spec.effort_args(effort)
     stdin_bytes = spec.build_stdin(input_payload)
 
     data_dir.mkdir(parents=True, exist_ok=True)
@@ -330,6 +342,7 @@ async def run_harness(
                 "shell_repr": " ".join(shlex.quote(c) for c in cmd),
                 "stdin": "input.json (as text prompt wrapping the JSON payload)",
                 "model": model,
+                "effort": effort,
                 "resume_session": resume_session,
             },
             indent=2,

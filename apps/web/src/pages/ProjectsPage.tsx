@@ -31,7 +31,10 @@ export function ProjectsPage() {
       setName("");
       setUrl("");
       setError(null);
-      navigate(`/projects/${resp.project.id}`);
+      // Land on the prepare loading page so the user watches the static-facts
+      // + threat-model-dossier hunt happen live before the project detail
+      // page is revealed.
+      navigate(`/projects/${resp.project.id}/prepare`);
     },
     onError: (e: any) => setError(e?.message ?? "create failed"),
   });
@@ -142,7 +145,7 @@ export function ProjectsPage() {
               disabled={!name || !url || create.isPending}
               data-testid="new-project-submit"
             >
-              {create.isPending ? "creating…" : "Create + start searcher"}
+              {create.isPending ? "creating…" : "Create + start prepare"}
             </Button>
           </div>
         </div>

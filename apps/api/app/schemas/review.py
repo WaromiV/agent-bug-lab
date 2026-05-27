@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-ReviewerRole = Literal["cleaner_agent", "critical_thinking_agent", "human"]
+ReviewerRole = Literal["cleaner_agent", "human"]
 Decision = Literal["kept", "removed", "refined", "needs_more_work"]
 
 
@@ -28,7 +28,3 @@ class CleanRequest(BaseModel):
     bug_ids: list[str] = Field(min_length=1)
 
 
-class CriticalRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    bug_id: str

@@ -51,11 +51,16 @@ def cancel_run(run_id: str, db: DbSession) -> RunRead:
 
 @router.post("/{run_id}/resume", response_model=RunRead)
 async def resume_run(run_id: str, db: DbSession, pool: ArqPool) -> RunRead:
+    from app.services import settings_service
+
     original = db.get(AgentRun, run_id)
     if original is None:
         raise HTTPException(404, "run not found")
     if original.role != "searcher_agent":
         raise HTTPException(400, "only searcher runs can be resumed in MVP")
+
+    cfg = settings_service.get_or_init(db)
+    use_resume = cfg.use_resume_when_available and original.harness_session_id
 
     new_run_id = next_id(db, "run")
     raw_input = dict(original.raw_input)
@@ -66,10 +71,11 @@ async def resume_run(run_id: str, db: DbSession, pool: ArqPool) -> RunRead:
         role=original.role,
         harness=original.harness,
         model=original.model,
+        effort=original.effort,
         objective=original.objective,
         raw_input=raw_input,
-        resume_from_run_id=original.id,
-        harness_session_id=original.harness_session_id,
+        resume_from_run_id=original.id if use_resume else None,
+        harness_session_id=original.harness_session_id if use_resume else None,
         run_id=new_run_id,
     )
     db.commit()

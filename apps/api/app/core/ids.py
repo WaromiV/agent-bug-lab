@@ -9,6 +9,8 @@ _PREFIX = {
     "run": "run",
     "bug": "bug",
     "review": "review",
+    "debate": "debate",
+    "dturn": "dturn",
 }
 
 _SEQUENCE = {
@@ -17,6 +19,8 @@ _SEQUENCE = {
     "run": "run_id_seq",
     "bug": "bug_id_seq",
     "review": "review_id_seq",
+    "debate": "debate_id_seq",
+    "dturn": "dturn_id_seq",
 }
 
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any
 
 from sqlalchemy import select
@@ -12,30 +11,6 @@ from app.db.models import Scope
 from app.schemas.scope import ScopeCreate, ScopePatch
 
 log = get_logger(__name__)
-
-
-@dataclass(frozen=True)
-class PreliminaryScope:
-    seed_id: str
-    name: str
-    description: str
-
-
-# The seed vocabulary every new project gets. Agents may add to this freely
-# but may not delete entries. Keep aligned with migration 0003_scope_ownership.
-PRELIMINARY_SCOPES: tuple[PreliminaryScope, ...] = (
-    PreliminaryScope("scope_memory_safety",          "Memory safety",          "Buffer overflows, use-after-free, double free, integer overflows, OOB read/write."),
-    PreliminaryScope("scope_authentication",         "Authentication",         "Authentication boundary issues, credential handling, session establishment."),
-    PreliminaryScope("scope_authorization",          "Authorization",          "Privilege boundaries, permission checks, capability/role enforcement."),
-    PreliminaryScope("scope_input_validation",       "Input validation",       "Injection sinks (SQL, command, SSTI), SSRF, deserialization, missing/weak validation."),
-    PreliminaryScope("scope_cryptography",           "Cryptography",           "Weak / misused / predictable / homegrown crypto, key handling, RNG quality."),
-    PreliminaryScope("scope_ipc_boundary",           "IPC trust boundary",     "Privilege/process-boundary IPC: parent-trusts-child, validation gaps on IPC messages."),
-    PreliminaryScope("scope_race_conditions",        "Race conditions",        "TOCTOU, data races, lock ordering, atomicity violations."),
-    PreliminaryScope("scope_denial_of_service",      "Denial of service",      "Resource exhaustion, unbounded growth, panic / crash paths."),
-    PreliminaryScope("scope_information_disclosure", "Information disclosure", "Side channels, error/log leaks, unintended cross-origin exposure."),
-    PreliminaryScope("scope_supply_chain",           "Supply chain",           "Dependency / build / update / signing / distribution weaknesses."),
-    PreliminaryScope("scope_logic_flaws",            "Logic flaws",            "Business-logic, state-machine, invariant violations not covered above."),
-)
 
 
 class ScopeOpsError(ValueError):
@@ -75,26 +50,6 @@ def patch(db: Session, scope: Scope, payload: ScopePatch) -> Scope:
     db.flush()
     log.info("scope.renamed", scope_id=scope.id, name=scope.name)
     return scope
-
-
-def seed_preliminary_scopes(db: Session, project_id: str) -> list[Scope]:
-    """Idempotently insert the PRELIMINARY_SCOPES vocabulary for this project."""
-    existing_names = {s.name for s in list_for_project(db, project_id)}
-    seeded: list[Scope] = []
-    for p in PRELIMINARY_SCOPES:
-        if p.name in existing_names:
-            continue
-        seeded.append(
-            create(
-                db,
-                project_id=project_id,
-                payload=ScopeCreate(name=p.name, description=p.description),
-                explicit_id=f"{p.seed_id}__{project_id}",
-            )
-        )
-    if seeded:
-        log.info("scopes.preliminary_seeded", project_id=project_id, count=len(seeded))
-    return seeded
 
 
 def apply_scope_ops(db: Session, project_id: str, scope_ops: Any) -> dict[str, str]:
@@ -193,12 +148,3 @@ def resolve_scope_id(db: Session, project_id: str, scope_id: str, id_map: dict[s
     if db.get(Scope, qualified) is not None:
         return qualified
     raise ScopeOpsError(f"unresolved scope id: {scope_id!r}")
-
-
-def ensure_default(db: Session, project_id: str, name: str) -> Scope:
-    """Return the project's first scope, seeding the preliminary set if empty."""
-    existing = list_for_project(db, project_id)
-    if existing:
-        return existing[0]
-    seeded = seed_preliminary_scopes(db, project_id)
-    return seeded[0]

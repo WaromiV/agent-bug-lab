@@ -18,8 +18,8 @@ branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 
-# Keep this list aligned with app.services.scope_service.PRELIMINARY_SCOPES.
-# It lives here as raw rows so the migration is self-contained.
+# Historical seed list. Auto-seeding has since been removed from the app;
+# these rows remain only in databases migrated through this revision.
 _PRELIMINARY: list[tuple[str, str, str]] = [
     ("scope_memory_safety",         "Memory safety",         "Buffer overflows, use-after-free, double free, integer overflows, OOB read/write."),
     ("scope_authentication",        "Authentication",        "Authentication boundary issues, credential handling, session establishment."),

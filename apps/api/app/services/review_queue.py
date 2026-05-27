@@ -107,6 +107,10 @@ def list_all_bugs_with_review(
     if search:
         like = f"%{search}%"
         q = q.where(Bug.description.ilike(like))
+    # Newest first. Bug ids come from a monotonic Postgres sequence so the
+    # lex order on the zero-padded text id matches insertion order — fresh
+    # searcher findings land at the top of the table.
+    q = q.order_by(desc(Bug.id))
     rows = db.execute(q).all()
     bug_ids = [b.id for b, _ in rows]
     latest_decisions = _latest_review_per_bug(db, bug_ids)

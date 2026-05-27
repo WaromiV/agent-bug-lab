@@ -43,6 +43,11 @@ Thumbs.db
 # ── Runtime artifacts (forensic, generated per run, never committed) ────────
 /data/*
 !/data/.gitkeep
+# Per-run artifacts + cloned target repos live here too (~1GB), never commit.
+apps/api/data/
+
+# ── Local agent harness state (machine-specific) ────────────────────────────
+.claude/
 
 # ── Browser / e2e screenshots and recordings ────────────────────────────────
 .playwright-mcp/
@@ -51,6 +56,9 @@ test-results/
 e2e-*.png
 e2e-*.jpg
 *.har
+
+# ── Bounty findings — never commit (private disclosure only) ───────────────
+/findings/
 
 # ── Misc ───────────────────────────────────────────────────────────────────
 *.log

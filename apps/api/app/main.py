@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import bugs, harnesses, logs, projects, reviews, runs, scopes
+from app.api.routes import bugs, debates, harnesses, logs, projects, reviews, runs, scopes
 from app.api.routes import settings as settings_route
 from app.core.logging import configure_logging, get_logger
 from app.db.session import SessionLocal
@@ -49,5 +49,6 @@ for r in (
     harnesses.router,
     logs.router,
     scopes.router,
+    debates.router,
 ):
     app.include_router(r, prefix="/api")

@@ -36,7 +36,10 @@ export function RunDetailPage() {
           <h1 className="font-mono text-2xl">{run.id}</h1>
           <div className="mt-1 flex items-center gap-3 text-sm text-text-muted">
             <StatusBadge status={run.status} />
-            <span>{run.harness} · {run.model}</span>
+            <span>
+              {run.harness} · {run.model}
+              {run.effort ? <> · <span className="text-text">effort {run.effort}</span></> : null}
+            </span>
             <Link to={`/projects/${run.project_id}`} className="hover:text-text">
               {run.project_id}
             </Link>

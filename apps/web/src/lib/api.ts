@@ -4,7 +4,9 @@ import type {
   BugListItem,
   BugPatch,
   CleanRequest,
-  CriticalRequest,
+  DebateRead,
+  DebateStartRequest,
+  DebateTranscript,
   Harness,
   Project,
   ProjectCreate,
@@ -63,10 +65,41 @@ export const api = {
     }),
   deleteProject: (id: string) =>
     request<void>(`/projects/${id}`, { method: "DELETE" }),
-  startSearcher: (id: string) =>
-    request<{ run_id: string }>(`/projects/${id}/start-searcher`, {
-      method: "POST",
-    }),
+  startSearcher: (id: string, count: number = 1) =>
+    request<{ run_ids: string[]; count: number }>(
+      `/projects/${id}/start-searcher?count=${count}`,
+      { method: "POST" },
+    ),
+  dedupProject: (id: string) =>
+    request<{
+      groups_count: number;
+      deleted_count: number;
+      candidates_seen: number;
+      groups: { canonical: string; duplicates: string[]; reason: string }[];
+      deleted_bug_ids: string[];
+      kept_canonical_ids: string[];
+      model_summary: string;
+      data_dir: string;
+    }>(`/projects/${id}/dedup`, { method: "POST" }),
+  exportProject: async (
+    id: string,
+  ): Promise<{ blob: Blob; filename: string }> => {
+    const res = await fetch(`${BASE}/projects/${id}/export`, { method: "POST" });
+    if (!res.ok) {
+      let detail: unknown;
+      try {
+        detail = await res.json();
+      } catch {
+        detail = await res.text();
+      }
+      throw new ApiError(res.status, detail);
+    }
+    const blob = await res.blob();
+    const cd = res.headers.get("Content-Disposition") || "";
+    const m = /filename="([^"]+)"/i.exec(cd);
+    const filename = m?.[1] || `findings_${id}.md`;
+    return { blob, filename };
+  },
 
   // ── runs ──
   listRuns: (params: { project_id?: string; limit?: number } = {}) => {
@@ -137,11 +170,15 @@ export const api = {
       method: "POST",
       body: JSON.stringify(body),
     }),
-  runCritical: (body: CriticalRequest) =>
-    request<Run>("/review-queue/critical", {
+
+  // ── debates ──
+  startDebate: (bugId: string, body: DebateStartRequest = {}) =>
+    request<DebateRead>(`/bugs/${bugId}/debate`, {
       method: "POST",
       body: JSON.stringify(body),
     }),
+  getDebate: (bugId: string) =>
+    request<DebateTranscript | null>(`/bugs/${bugId}/debate`),
 
   // ── settings ──
   getSettings: () => request<Settings>("/settings"),

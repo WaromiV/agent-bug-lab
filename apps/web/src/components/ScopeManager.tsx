@@ -5,7 +5,6 @@ import { api } from "@/lib/api";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
-import { Badge } from "@/components/ui/Badge";
 import type { Scope } from "@/lib/types";
 
 interface Props {
@@ -105,10 +104,6 @@ export function ScopeManager({ projectId }: Props) {
   );
 }
 
-function isPreliminary(scope: Scope): boolean {
-  return scope.is_preliminary;
-}
-
 function ScopeRow({
   scope,
   editing,
@@ -134,8 +129,6 @@ function ScopeRow({
       api.patchScope(scope.id, { name, description: description || null }),
     onSuccess: onSaved,
   });
-
-  const prelim = isPreliminary(scope);
 
   if (editing) {
     return (
@@ -174,12 +167,7 @@ function ScopeRow({
 
   return (
     <tr className="border-t border-border">
-      <td className="py-2 font-mono text-xs text-text-muted">
-        {scope.id}
-        {prelim ? (
-          <Badge className="ml-2 bg-bg-subtle text-text-muted">preliminary</Badge>
-        ) : null}
-      </td>
+      <td className="py-2 font-mono text-xs text-text-muted">{scope.id}</td>
       <td className="py-2 text-text">{scope.name}</td>
       <td className="py-2 text-text-muted">{scope.description || "—"}</td>
       <td className="py-2 text-right">

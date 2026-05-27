@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Brain, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input, Label, Textarea } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { SeverityBadge } from "@/components/SeverityBadge";
+import { DebateButton } from "@/components/DebateButton";
+import { DebateTranscriptCard } from "@/components/DebateTranscriptCard";
 import type { Severity } from "@/lib/types";
 
 const sevOptions = [
@@ -76,10 +78,6 @@ export function BugDetailPage() {
     mutationFn: () => api.deleteBug(id),
     onSuccess: () => navigate("/bugs"),
   });
-  const critical = useMutation({
-    mutationFn: () => api.runCritical({ bug_id: id }),
-    onSuccess: (run) => navigate(`/runs/${run.id}`),
-  });
 
   if (!bug) return <div className="text-sm text-text-muted">Loading…</div>;
 
@@ -104,15 +102,8 @@ export function BugDetailPage() {
             </span>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant="primary"
-            onClick={() => critical.mutate()}
-            disabled={critical.isPending}
-            data-testid="run-critical-button"
-          >
-            <Brain className="h-4 w-4" /> Run critical-thinking
-          </Button>
+        <div className="flex items-center gap-2">
+          <DebateButton bugId={id} size="md" />
           <Button variant="danger" onClick={() => del.mutate()} disabled={del.isPending}>
             <Trash2 className="h-4 w-4" /> Delete
           </Button>
@@ -189,6 +180,8 @@ export function BugDetailPage() {
           </div>
         </CardBody>
       </Card>
+
+      <DebateTranscriptCard bugId={id} />
     </div>
   );
 }

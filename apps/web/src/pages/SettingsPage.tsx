@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import type { Effort } from "@/lib/types";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+
+const effortOptions = [
+  { label: "low",    value: "low" },
+  { label: "medium", value: "medium" },
+  { label: "high",   value: "high" },
+  { label: "xhigh",  value: "xhigh" },
+  { label: "max",    value: "max" },
+];
 
 export function SettingsPage() {
   const qc = useQueryClient();
@@ -16,6 +25,10 @@ export function SettingsPage() {
 
   const [selectedHarness, setSelectedHarness] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
+  const [secondaryModel, setSecondaryModel] = useState("");
+  const [secondaryHarness, setSecondaryHarness] = useState("");
+  const [selectedEffort, setSelectedEffort] = useState<Effort>("max");
+  const [debateRounds, setDebateRounds] = useState<number>(3);
   const [useResume, setUseResume] = useState(true);
   const [savedNote, setSavedNote] = useState<string | null>(null);
 
@@ -23,6 +36,10 @@ export function SettingsPage() {
     if (settings) {
       setSelectedHarness(settings.selected_harness);
       setSelectedModel(settings.selected_model);
+      setSecondaryModel(settings.secondary_model ?? "");
+      setSecondaryHarness(settings.secondary_harness ?? "");
+      setSelectedEffort(settings.selected_effort);
+      setDebateRounds(settings.debate_max_rounds);
       setUseResume(settings.use_resume_when_available);
     }
   }, [settings]);
@@ -32,6 +49,10 @@ export function SettingsPage() {
       api.patchSettings({
         selected_harness: selectedHarness,
         selected_model: selectedModel,
+        secondary_model: secondaryModel.trim() === "" ? null : secondaryModel.trim(),
+        secondary_harness: secondaryHarness.trim() === "" ? null : secondaryHarness.trim(),
+        selected_effort: selectedEffort,
+        debate_max_rounds: debateRounds,
         use_resume_when_available: useResume,
       }),
     onSuccess: () => {
@@ -71,14 +92,83 @@ export function SettingsPage() {
             </p>
           </div>
           <div>
-            <Label htmlFor="model">Model</Label>
+            <Label htmlFor="model">Primary model</Label>
             <Input
               id="model"
               data-testid="model-input"
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
-              placeholder="e.g. claude-haiku-4-5-20251001 / gpt-5-codex"
+              placeholder="e.g. claude-opus-4-7 / claude-haiku-4-5-20251001 / gpt-5-codex"
             />
+            <p className="mt-1 text-xs text-text-subtle">
+              Used by searcher, cleaner, prepare, debater_pro, and the judge.
+            </p>
+          </div>
+          <div>
+            <Label htmlFor="secondary-model">Secondary model (debate-debunk)</Label>
+            <Input
+              id="secondary-model"
+              data-testid="secondary-model-input"
+              value={secondaryModel}
+              onChange={(e) => setSecondaryModel(e.target.value)}
+              placeholder="leave empty to use primary"
+            />
+            <p className="mt-1 text-xs text-text-subtle">
+              Used only by debater_con — the counterpoint side that tries to break
+              the bug. Microsoft's MDASH spec uses a separate model for the
+              refuter; empty falls back to primary.
+            </p>
+          </div>
+          <div>
+            <Label htmlFor="secondary-harness">Secondary harness (debate-debunk)</Label>
+            <Select
+              id="secondary-harness"
+              data-testid="secondary-harness-select"
+              value={secondaryHarness}
+              onChange={(e) => setSecondaryHarness(e.target.value)}
+              options={[
+                { label: "(use primary)", value: "" },
+                ...(harnesses ? harnesses.map((h) => ({ label: h.name, value: h.name })) : []),
+              ]}
+            />
+            <p className="mt-1 text-xs text-text-subtle">
+              CLI used to invoke the secondary model — set when secondary model
+              belongs to a different vendor than the primary
+              (e.g. primary <code className="text-text-muted">claude_code</code>,
+              secondary <code className="text-text-muted">codex</code>).
+              Empty = same harness as primary.
+            </p>
+          </div>
+          <div>
+            <Label htmlFor="effort">Reasoning effort</Label>
+            <Select
+              id="effort"
+              data-testid="effort-select"
+              value={selectedEffort}
+              onChange={(e) => setSelectedEffort(e.target.value as Effort)}
+              options={effortOptions}
+            />
+            <p className="mt-1 text-xs text-text-subtle">
+              Higher effort = deeper reasoning + bigger cost / longer runs. Claude
+              Code maps this to <code className="text-text-muted">--effort</code>.
+              Codex ignores it (configure via <code className="text-text-muted">~/.codex/config.toml</code>).
+            </p>
+          </div>
+          <div>
+            <Label htmlFor="debate-rounds">Debate rounds (N)</Label>
+            <Input
+              id="debate-rounds"
+              data-testid="debate-rounds-input"
+              type="number"
+              min={1}
+              max={20}
+              value={debateRounds}
+              onChange={(e) => setDebateRounds(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
+            />
+            <p className="mt-1 text-xs text-text-subtle">
+              Every debate runs EXACTLY this many rounds. Per-round judge cannot
+              halt early. Higher N = deeper rebuttal cycles + bigger cost.
+            </p>
           </div>
           <label className="flex items-center gap-2 text-sm text-text-muted">
             <input

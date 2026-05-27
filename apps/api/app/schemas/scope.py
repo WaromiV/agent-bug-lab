@@ -13,7 +13,6 @@ class ScopeRead(BaseModel):
     name: str
     description: str | None
     created_at: datetime
-    is_preliminary: bool = False
 
 
 class ScopeCreate(BaseModel):

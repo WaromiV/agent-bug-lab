@@ -17,6 +17,7 @@ def get_or_init(db: Session) -> Setting:
             id=GLOBAL_ID,
             selected_harness=cfg.default_harness,
             selected_model=cfg.default_model,
+            selected_effort="max",
             use_resume_when_available=True,
         )
         db.add(s)

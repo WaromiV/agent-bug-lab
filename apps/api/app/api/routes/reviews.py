@@ -5,9 +5,9 @@ from fastapi import APIRouter, HTTPException
 from app.api.deps import ArqPool, DbSession
 from app.db.models import Bug, Project, Scope
 from app.schemas.bug import BugListItem
-from app.schemas.review import CleanRequest, CriticalRequest
+from app.schemas.review import CleanRequest
 from app.schemas.run import RunRead
-from app.services import cleaner_service, critical_service, review_queue, settings_service
+from app.services import cleaner_service, review_queue, settings_service
 
 router = APIRouter(prefix="/review-queue", tags=["reviews"])
 
@@ -47,23 +47,10 @@ async def clean(payload: CleanRequest, db: DbSession, pool: ArqPool) -> RunRead:
         bugs=bugs,
         harness=cfg.selected_harness,
         model=cfg.selected_model,
+        effort=cfg.selected_effort,
     )
     db.commit()
     await pool.enqueue_job("run_cleaner", run.id)
     return RunRead.model_validate(run)
 
 
-@router.post("/critical", response_model=RunRead, status_code=201)
-async def critical(payload: CriticalRequest, db: DbSession, pool: ArqPool) -> RunRead:
-    project, bugs = _project_for_bugs(db, [payload.bug_id])
-    cfg = settings_service.get_or_init(db)
-    run = critical_service.queue_critical_run(
-        db,
-        project=project,
-        bug=bugs[0],
-        harness=cfg.selected_harness,
-        model=cfg.selected_model,
-    )
-    db.commit()
-    await pool.enqueue_job("run_critical", run.id)
-    return RunRead.model_validate(run)

@@ -1,0 +1,12 @@
+[project]
+name = "cost-stuffing-poc"
+description = "PoC: Clarity VM filter/fold/map cost underpricing"
+authors = []
+telemetry = false
+cache_dir = "./.cache"
+requirements = []
+
+[contracts.cost-stuffing]
+path = "contracts/cost-stuffing.clar"
+clarity_version = 2
+epoch = 3.0
